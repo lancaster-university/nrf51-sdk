@@ -2599,7 +2599,7 @@ void dm_ble_evt_handler(ble_evt_t * p_ble_evt)
                 {
                     if (m_irk_index_table[p_ble_evt->evt.gap_evt.params.connected.irk_match_idx] != DM_INVALID_ID)
                     {
-                        device_index = m_irk_index_table[p_ble_evt->evt.gap_evt.params.connected.irk_match_idx];
+                        device_index = im_peer_id_get_by_irk_match_idx(p_ble_evt->evt.gap_evt.params.connected.irk_match_idx);
                         err_code = NRF_SUCCESS;
                     }
                 }
