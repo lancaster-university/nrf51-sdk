@@ -209,7 +209,7 @@ typedef enum
  * @defgroup api_param_check API Parameters check macros.
  *
  * @details Macros for verifying parameters passed to the module in the APIs. These macros
- *          could be mapped to nothing in the final version of the code in order to save execution 
+ *          could be mapped to nothing in the final version of the code in order to save execution
  *          time and program size.
  * @{
  */
@@ -374,7 +374,7 @@ typedef enum
 /**@brief Peer identification information.
  */
 typedef struct
-{ 
+{
     ble_gap_id_key_t peer_id;   /**< IRK and/or address of peer. */
     uint16_t         ediv;      /**< Peer's encrypted diversifier. */
     uint8_t          id_bitmap; /**< Contains information if above field is valid. */
@@ -614,11 +614,11 @@ static __INLINE void application_instance_init(uint32_t index)
 static __INLINE void connection_instance_init(uint32_t index)
 {
     DM_TRC("[DM]: Initializing Connection Instance 0x%08X.\r\n", index);
-    
+
     m_connection_table[index].state         = STATE_IDLE;
     m_connection_table[index].conn_handle   = BLE_CONN_HANDLE_INVALID;
     m_connection_table[index].bonded_dev_id = DM_INVALID_ID;
-    
+
     memset(&m_connection_table[index].peer_addr, 0, sizeof (ble_gap_addr_t));
 }
 
@@ -630,7 +630,7 @@ static __INLINE void connection_instance_init(uint32_t index)
 static __INLINE void peer_instance_init(uint32_t index)
 {
     DM_TRC("[DM]: Initializing Peer Instance 0x%08X.\r\n", index);
-    
+
     memset(m_peer_table[index].peer_id.id_addr_info.addr, 0, BLE_GAP_ADDR_LEN);
     memset(m_peer_table[index].peer_id.id_info.irk, 0, BLE_GAP_SEC_KEY_LEN);
 
@@ -721,9 +721,9 @@ static __INLINE ret_code_t device_instance_allocate(uint8_t *              p_dev
 
     for (index = 0; index < DEVICE_MANAGER_MAX_BONDS; index++)
     {
-        DM_TRC("[DM]:[DI 0x%02X]: Device type 0x%02X.\r\n",
+        printf("[DM]:[DI 0x%02X]: Device type 0x%02X.\r\n",
                index, m_peer_table[index].peer_id.id_addr_info.addr_type);
-        DM_TRC("[DM]: Device Addr 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X.\r\n",
+        printf("[DM]: Device Addr 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X.\r\n",
                m_peer_table[index].peer_id.id_addr_info.addr[0],
                m_peer_table[index].peer_id.id_addr_info.addr[1],
                m_peer_table[index].peer_id.id_addr_info.addr[2],
@@ -746,8 +746,8 @@ static __INLINE ret_code_t device_instance_allocate(uint8_t *              p_dev
             (*p_device_index) = index;
             err_code          = NRF_SUCCESS;
 
-            DM_LOG("[DM]: Allocated device instance 0x%02X\r\n", index);
-            
+            printf("[DM]: Allocated device instance 0x%02X\r\n", index);
+
             break;
         }
     }
@@ -801,10 +801,10 @@ static ret_code_t device_instance_find(ble_gap_addr_t const * p_addr, uint32_t *
     uint32_t   index;
 
     err_code = NRF_ERROR_NOT_FOUND;
-    
+
     if (NULL != p_addr)
     {
-        DM_TRC("[DM]: Searching for device 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X.\r\n",
+        printf("[DM]: Searching for device 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X.\r\n",
                p_addr->addr[0],
                p_addr->addr[1],
                p_addr->addr[2],
@@ -815,9 +815,9 @@ static ret_code_t device_instance_find(ble_gap_addr_t const * p_addr, uint32_t *
 
     for (index = 0; index < DEVICE_MANAGER_MAX_BONDS; index++)
     {
-        DM_TRC("[DM]:[DI 0x%02X]: Device type 0x%02X.\r\n",
+        printf("[DM]:[DI 0x%02X]: Device type 0x%02X.\r\n",
                index, m_peer_table[index].peer_id.id_addr_info.addr_type);
-        DM_TRC("[DM]: Device Addr 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X.\r\n",
+        printf("[DM]: Device Addr 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X.\r\n",
                m_peer_table[index].peer_id.id_addr_info.addr[0],
                m_peer_table[index].peer_id.id_addr_info.addr[1],
                m_peer_table[index].peer_id.id_addr_info.addr[2],
@@ -878,18 +878,18 @@ static __INLINE uint32_t connection_instance_allocate(uint32_t * p_instance)
 {
     uint32_t err_code;
 
-    DM_TRC("[DM]: Request to allocation connection instance\r\n");
+    printf("[DM]: Request to allocation connection instance\r\n");
 
     err_code = connection_instance_find(BLE_CONN_HANDLE_INVALID, STATE_IDLE, p_instance);
 
     if (err_code == NRF_SUCCESS)
     {
-        DM_LOG("[DM]:[%02X]: Connection Instance Allocated.\r\n", (*p_instance));        
+        printf("[DM]:[%02X]: Connection Instance Allocated.\r\n", (*p_instance));
         m_connection_table[*p_instance].state = STATE_CONNECTED;
     }
     else
     {
-        DM_LOG("[DM]: No free connection instances available\r\n");        
+        printf("[DM]: No free connection instances available\r\n");
         err_code = NRF_ERROR_NO_MEM;
     }
 
@@ -904,11 +904,11 @@ static __INLINE uint32_t connection_instance_allocate(uint32_t * p_instance)
  */
 static __INLINE void connection_instance_free(uint32_t const * p_instance)
 {
-    DM_TRC("[DM]:[CI 0x%02X]: Freeing connection instance\r\n", (*p_instance));
+    printf("[DM]:[CI 0x%02X]: Freeing connection instance\r\n", (*p_instance));
 
     if (m_connection_table[*p_instance].state != STATE_IDLE)
     {
-        DM_LOG("[DM]:[%02X]: Freed connection instance.\r\n", (*p_instance));
+        printf("[DM]:[%02X]: Freed connection instance.\r\n", (*p_instance));
         connection_instance_init(*p_instance);
     }
 }
@@ -959,21 +959,21 @@ static __INLINE void device_context_store(dm_handle_t const * p_handle, device_s
              (m_connection_table[p_handle->connection_id].state & STATE_BOND_INFO_UPDATE)) ||
             (state == UPDATE_PEER_ADDR))
         {
-            DM_LOG("[DM]:[DI %02X]:[CI %02X]: -> Updating bonding information.\r\n",
+            printf("[DM]:[DI %02X]:[CI %02X]: -> Updating bonding information.\r\n",
                    p_handle->device_id, p_handle->connection_id);
 
             store_fn = pstorage_update;
         }
         else if (state == FIRST_BOND_STORE)
         {
-            DM_LOG("[DM]:[DI %02X]:[CI %02X]: -> Storing bonding information.\r\n",
+            printf("[DM]:[DI %02X]:[CI %02X]: -> Storing bonding information.\r\n",
                    p_handle->device_id, p_handle->connection_id);
 
             store_fn = pstorage_store;
         }
         else
         {
-            DM_LOG("[DM]:[DI %02X]:[CI %02X]: -> No update in bonding information.\r\n",
+            printf("[DM]:[DI %02X]:[CI %02X]: -> No update in bonding information.\r\n",
                    p_handle->device_id, p_handle->connection_id);
 
             //No operation needed.
@@ -1715,20 +1715,22 @@ ret_code_t dm_init(dm_init_param_t const * const p_init_param)
                         // In case a peer device could not be loaded successfully, rest of the
                         // initialization procedure are skipped and an error is sent to the
                         // application.
-                        DM_ERR(
+                        printf(
                             "[DM]: Failed to load peer device %08X from storage, reason %08X.\r\n",
                             index,
                             err_code);
+
+
 
                         m_module_initialized = false;
                         break;
                     }
                     else
                     {
-                        DM_TRC("[DM]:[DI 0x%02X]: Device type 0x%02X.\r\n",
+                        printf("[DM]:[DI 0x%02X]: Device type 0x%02X.\r\n",
                                index,
                                m_peer_table[index].peer_id.id_addr_info.addr_type);
-                        DM_TRC("[DM]: Device Addr 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X.\r\n",
+                        printf("[DM]: Device Addr 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X.\r\n",
                                m_peer_table[index].peer_id.id_addr_info.addr[0],
                                m_peer_table[index].peer_id.id_addr_info.addr[1],
                                m_peer_table[index].peer_id.id_addr_info.addr[2],
@@ -1741,7 +1743,7 @@ ret_code_t dm_init(dm_init_param_t const * const p_init_param)
                 {
                     //In case a peer device could not be loaded successfully, rest of the
                     //initialization procedure are skipped and an error is sent to the application.
-                    DM_LOG("[DM]: Failed to get block handle for instance %08X, reason %08X.\r\n",
+                    printf("[DM]: Failed to get block handle for instance %08X, reason %08X.\r\n",
                            index,
                            err_code);
 
@@ -1760,6 +1762,16 @@ ret_code_t dm_init(dm_init_param_t const * const p_init_param)
     {
         DM_ERR("[DM]: Failed to register with storage module, reason 0x%08X.\r\n", err_code);
     }
+
+    uint32_t irkCount = 0;
+
+    for (uint32_t index = DEVICE_MANAGER_MAX_BONDS; index > 0; index--)
+        if((m_peer_table[index].id_bitmap & IRK_ENTRY) == 0 && (m_peer_table[index].id_bitmap & ADDR_ENTRY) == 1)
+        {
+            printf("[0x%02X]Index %d is an IRK, placing %d\r\n", m_peer_table[index].id_bitmap,index,irkCount);
+            m_irk_index_table[irkCount] = index;
+            irkCount++;
+        }
 
     DM_MUTEX_UNLOCK();
 
@@ -1912,8 +1924,9 @@ ret_code_t dm_whitelist_create(dm_application_instance_t const * p_handle,
 
         if (connected == false)
         {
+            printf("irkentry %d addrentry %d", (m_peer_table[index].id_bitmap & IRK_ENTRY), (m_peer_table[index].id_bitmap & ADDR_ENTRY));
             if ((irk_count < p_whitelist->irk_count) &&
-                ((m_peer_table[index].id_bitmap & IRK_ENTRY) == 0))
+                ((m_peer_table[index].id_bitmap & IRK_ENTRY) == 0) && (m_peer_table[index].id_bitmap & ADDR_ENTRY) != 0)
             {
                 p_whitelist->pp_irks[irk_count] = &m_peer_table[index].peer_id.id_info;
                 m_irk_index_table[irk_count]    = index;
@@ -1932,7 +1945,7 @@ ret_code_t dm_whitelist_create(dm_application_instance_t const * p_handle,
     p_whitelist->addr_count = addr_count;
     p_whitelist->irk_count  = irk_count;
 
-    DM_LOG("[DM]: Created whitelist, number of IRK = 0x%02X, number of addr = 0x%02X\r\n",
+    printf("[DM]: Created whitelist, number of IRK = 0x%02X, number of addr = 0x%02X\r\n",
            irk_count,
            addr_count);
 
@@ -2490,7 +2503,7 @@ void bond_data_load(dm_handle_t * p_handle)
                                                        &block_handle);
     if (err_code == NRF_SUCCESS)
     {
-        DM_LOG(
+        printf(
             "[DM]:[%02X]:[Block ID 0x%08X]:Loading bond information at %p, size 0x%08X, offset 0x%08X.\r\n",
             p_handle->connection_id,
             block_handle.block_id,
@@ -2505,12 +2518,12 @@ void bond_data_load(dm_handle_t * p_handle)
 
         if (err_code != NRF_SUCCESS)
         {
-            DM_ERR("[DM]:[%02X]: Failed to load Bond information, reason %08X\r\n",
+            printf("[DM]:[%02X]: Failed to load Bond information, reason %08X\r\n",
                    p_handle->connection_id,
                    err_code);
         }
 
-        DM_LOG(
+        printf(
             "[DM]:[%02X]:Loading service context at %p, size 0x%08X, offset 0x%08X.\r\n",
             p_handle->connection_id,
             &m_gatts_table[p_handle->connection_id],
@@ -2523,7 +2536,7 @@ void bond_data_load(dm_handle_t * p_handle)
 
         if (err_code != NRF_SUCCESS)
         {
-            DM_ERR(
+            printf(
                 "[DM]:[%02X]: Failed to load service information, reason %08X\r\n",
                 p_handle->connection_id,
                 err_code);
@@ -2531,11 +2544,21 @@ void bond_data_load(dm_handle_t * p_handle)
     }
     else
     {
-        DM_ERR("[DM]:[%02X]: Failed to get block identifier for "
+        printf("[DM]:[%02X]: Failed to get block identifier for "
                "device %08X, reason %08X.\r\n", p_handle->connection_id, p_handle->device_id, err_code);
     }
 }
 
+int address_to_device_id(ble_gap_addr_t const * p_addr)
+{
+    for(int peer_iterator = 0; peer_iterator < DEVICE_MANAGER_MAX_BONDS; peer_iterator++)
+    {
+        if(im_address_resolve(p_addr, &m_peer_table[peer_iterator].peer_id.id_info))
+            return peer_iterator;
+    }
+
+    return DM_INVALID_ID;
+}
 
 void dm_ble_evt_handler(ble_evt_t * p_ble_evt)
 {
@@ -2595,23 +2618,23 @@ void dm_ble_evt_handler(ble_evt_t * p_ble_evt)
                 m_connection_table[index].peer_addr   =
                     p_ble_evt->evt.gap_evt.params.connected.peer_addr;
 
-                if (p_ble_evt->evt.gap_evt.params.connected.irk_match == 1)
+                if ((device_index = address_to_device_id(&p_ble_evt->evt.gap_evt.params.connected.peer_addr)) != DM_INVALID_ID)
                 {
-                    if (m_irk_index_table[p_ble_evt->evt.gap_evt.params.connected.irk_match_idx] != DM_INVALID_ID)
-                    {
-                        device_index = im_peer_id_get_by_irk_match_idx(p_ble_evt->evt.gap_evt.params.connected.irk_match_idx);
-                        err_code = NRF_SUCCESS;
-                    }
+                    err_code = NRF_SUCCESS;
+
+                    printf("CONNECT: matched, addr_to_did %d\r\n", device_index);
                 }
                 else
                 {
                     //Use the device address to check if the device exists in the bonded device list.
                     err_code = device_instance_find(&p_ble_evt->evt.gap_evt.params.connected.peer_addr,
                                                     &device_index, EDIV_INIT_VAL);
+                    printf("CONNECT: not matched, status: %d found manually: %d\r\n", err_code, device_index);
                 }
 
                 if (err_code == NRF_SUCCESS)
                 {
+                    printf("CONNECT: SUCCESS!\r\n");
                     m_connection_table[index].bonded_dev_id = device_index;
                     m_connection_table[index].state        |= STATE_BONDED;
                     handle.device_id                        = device_index;
@@ -2619,12 +2642,15 @@ void dm_ble_evt_handler(ble_evt_t * p_ble_evt)
                     bond_data_load(&handle);
                 }
             }
+
+            printf("CONNECT: did %d bdid %d\r\n", handle.device_id, m_connection_table[index].bonded_dev_id);
+
             break;
 
         case BLE_GAP_EVT_DISCONNECTED:
             //Disconnection could be peer or self initiated hence disconnecting and connecting
             //both states are permitted, however, connection handle must be known.
-            DM_LOG("[DM]: Disconnect Reason 0x%04X\r\n",
+            printf("[DM]: Disconnect Reason 0x%04X\r\n",
                    p_ble_evt->evt.gap_evt.params.disconnected.reason);
 
             m_connection_table[index].state &= (~STATE_CONNECTED);
@@ -2654,11 +2680,13 @@ void dm_ble_evt_handler(ble_evt_t * p_ble_evt)
             break;
 
         case BLE_GAP_EVT_SEC_INFO_REQUEST:
-            DM_LOG("[DM]: >> BLE_GAP_EVT_SEC_INFO_REQUEST\r\n");
+            printf("[DM]: >> BLE_GAP_EVT_SEC_INFO_REQUEST\r\n");
 
             //If the device is already bonded, respond with existing info, else NULL.
             if (m_connection_table[index].bonded_dev_id == DM_INVALID_ID)
             {
+                printf("INVALID ID \r\n");
+
                 //Find device based on div.
                 err_code = device_instance_find(NULL,&device_index, p_ble_evt->evt.gap_evt.params.sec_info_request.master_id.ediv);
                 if (err_code == NRF_SUCCESS)
@@ -2673,6 +2701,7 @@ void dm_ble_evt_handler(ble_evt_t * p_ble_evt)
 
             if (m_connection_table[index].bonded_dev_id != DM_INVALID_ID)
             {
+                printf("VALID ID index %d bdid %d\r\n",index, m_connection_table[index].bonded_dev_id);
                 p_enc_info = &m_bond_table[index].peer_enc_key.enc_info;
                 DM_DUMP((uint8_t *)p_enc_info, sizeof(ble_gap_enc_info_t));
             }
@@ -2684,7 +2713,7 @@ void dm_ble_evt_handler(ble_evt_t * p_ble_evt)
 
             if (err_code != NRF_SUCCESS)
             {
-                DM_ERR("[DM]:[CI %02X]:[DI %02X]: Security information response failed, reason "
+                printf("[DM]:[CI %02X]:[DI %02X]: Security information response failed, reason "
                        "0x%08X\r\n", index, m_connection_table[index].bonded_dev_id, err_code);
             }
             break;
@@ -2692,13 +2721,26 @@ void dm_ble_evt_handler(ble_evt_t * p_ble_evt)
         case BLE_GAP_EVT_SEC_PARAMS_REQUEST:
             DM_LOG("[DM]: >> BLE_GAP_EVT_SEC_PARAMS_REQUEST\r\n");
 
+            printf("SEC_PARAM irkm: %d idx: %d \r\n",p_ble_evt->evt.gap_evt.params.connected.irk_match, p_ble_evt->evt.gap_evt.params.connected.irk_match_idx);
+
             event.event_id = DM_EVT_SECURITY_SETUP;
 
             m_connection_table[index].state |= STATE_PAIRING;
             notify_app                       = true;
 
+            if ((device_index = address_to_device_id(&p_ble_evt->evt.gap_evt.params.connected.peer_addr)) != DM_INVALID_ID)
+            {
+                handle.device_id                        = device_index;
+                m_connection_table[index].bonded_dev_id = device_index;
+                err_code = NRF_SUCCESS;
+
+                printf("REBONDING bdid %d, did %d, conn %d\r\n",m_connection_table[index].bonded_dev_id, handle.device_id, index);
+            }
+
             if (m_connection_table[index].bonded_dev_id == DM_INVALID_ID)
             {
+                printf("allocating new \r\n");
+
                 //Assign a peer index as a new bond or update existing bonds.
                 err_code = device_instance_allocate((uint8_t *)&device_index,
                                                     &m_connection_table[index].peer_addr);
@@ -2706,20 +2748,22 @@ void dm_ble_evt_handler(ble_evt_t * p_ble_evt)
                 //Allocation successful.
                 if (err_code == NRF_SUCCESS)
                 {
-                    DM_LOG("[DM]:[CI 0x%02X]:[DI 0x%02X]: Bonded!\r\n",index, device_index);
+
+                    printf("[DM]:[CI 0x%02X]:[DI 0x%02X]: Bonded!\r\n",index, device_index);
 
                     handle.device_id                        = device_index;
                     m_connection_table[index].bonded_dev_id = device_index;
                 }
                 else
                 {
-                    DM_LOG("[DM]: Security parameter request failed, reason 0x%08X.\r\n", err_code);
+                    printf("[DM]: Security parameter request failed, reason 0x%08X.\r\n", err_code);
                     event_result = err_code;
                     notify_app   = true;
                 }
             }
             else
             {
+                printf("refresh\r\n");
                 //Bond/key refresh.
                 event.event_id = DM_EVT_SECURITY_SETUP_REFRESH;
                 memset(m_gatts_table[index].attributes, 0, DM_GATT_SERVER_ATTR_MAX_SIZE);
@@ -2727,6 +2771,8 @@ void dm_ble_evt_handler(ble_evt_t * p_ble_evt)
                 //Set the update flag for bond data.
                 m_connection_table[index].state |= STATE_BOND_INFO_UPDATE;
             }
+
+            printf("FINAL [DM]:[CI 0x%02X]:[DI 0x%02X]: Bonded!\r\n",index, device_index);
 
             ble_gap_sec_keyset_t keys_exchanged;
 
@@ -2737,7 +2783,7 @@ void dm_ble_evt_handler(ble_evt_t * p_ble_evt)
                    p_ble_evt->evt.gap_evt.params.sec_params_request.peer_params.bond);
 
             keys_exchanged.keys_central.p_enc_key  = NULL;
-            keys_exchanged.keys_central.p_id_key   = &m_peer_table[m_connection_table[index].bonded_dev_id].peer_id; 
+            keys_exchanged.keys_central.p_id_key   = &m_peer_table[m_connection_table[index].bonded_dev_id].peer_id;
             keys_exchanged.keys_central.p_sign_key = NULL;
             keys_exchanged.keys_periph.p_enc_key   = &m_bond_table[index].peer_enc_key;
             keys_exchanged.keys_periph.p_id_key    = NULL;
@@ -2745,7 +2791,7 @@ void dm_ble_evt_handler(ble_evt_t * p_ble_evt)
 
             err_code = sd_ble_gap_sec_params_reply(p_ble_evt->evt.gap_evt.conn_handle,
                                                    BLE_GAP_SEC_STATUS_SUCCESS,
-                                                   &m_application_table[0].sec_param, 
+                                                   &m_application_table[0].sec_param,
                                                    &keys_exchanged);
 
             if (err_code != NRF_SUCCESS)
@@ -2768,6 +2814,7 @@ void dm_ble_evt_handler(ble_evt_t * p_ble_evt)
 
             if (p_ble_evt->evt.gap_evt.params.auth_status.auth_status != BLE_GAP_SEC_STATUS_SUCCESS)
             {
+                printf("bond failed\r\n");
                 // Free the allocation as bonding failed.
                 ret_code_t result = device_instance_free(m_connection_table[index].bonded_dev_id);
                 (void) result;
@@ -2775,6 +2822,7 @@ void dm_ble_evt_handler(ble_evt_t * p_ble_evt)
             }
             else
             {
+                printf("bonding\r\n");
                 DM_DUMP((uint8_t *)&p_ble_evt->evt.gap_evt.params.auth_status,
                         sizeof(ble_gap_evt_auth_status_t));
                 DM_DUMP((uint8_t *)&m_bond_table[index], sizeof(bond_context_t));
@@ -2788,11 +2836,13 @@ void dm_ble_evt_handler(ble_evt_t * p_ble_evt)
                         //IRK and/or public address is shared, update it.
                         if (p_ble_evt->evt.gap_evt.params.auth_status.kdist_central.id == 1)
                         {
+                            printf("shared\r\n");
                             m_peer_table[handle.device_id].id_bitmap &= (~IRK_ENTRY);
                         }
 
                         if (m_connection_table[index].bonded_dev_id != DM_INVALID_ID)
                         {
+                            printf("bonded index %d bdid %d\r\n", index,m_connection_table[index].bonded_dev_id);
                             DM_LOG("[DM]:[CI 0x%02X]:[DI 0x%02X]: Bonded!\r\n",
                                    index,
                                    handle.device_id);
@@ -2800,6 +2850,8 @@ void dm_ble_evt_handler(ble_evt_t * p_ble_evt)
                             if (m_connection_table[index].peer_addr.addr_type !=
                                 BLE_GAP_ADDR_TYPE_RANDOM_PRIVATE_RESOLVABLE)
                             {
+                                printf("not RPR\r\n");
+
                                m_peer_table[handle.device_id].peer_id.id_addr_info =
                                     m_connection_table[index].peer_addr;
                                m_peer_table[handle.device_id].id_bitmap &= (~ADDR_ENTRY);
@@ -2809,6 +2861,7 @@ void dm_ble_evt_handler(ble_evt_t * p_ble_evt)
                             }
                             else
                             {
+                                printf("PR\r\n");
                                 // Here we must fetch the keys from the keyset distributed.
                                 m_peer_table[handle.device_id].ediv       = m_bond_table[index].peer_enc_key.master_id.ediv;
                                 m_peer_table[handle.device_id].id_bitmap &= (~IRK_ENTRY);
@@ -2837,7 +2890,7 @@ void dm_ble_evt_handler(ble_evt_t * p_ble_evt)
             {
                 //Lost bond case, generate a security refresh event!
                 memset(m_gatts_table[index].attributes, 0, DM_GATT_SERVER_ATTR_MAX_SIZE);
-                
+
                 event.event_id                   = DM_EVT_SECURITY_SETUP_REFRESH;
                 m_connection_table[index].state |= STATE_PAIRING_PENDING;
                 m_connection_table[index].state |= STATE_BOND_INFO_UPDATE;
@@ -2854,7 +2907,7 @@ void dm_ble_evt_handler(ble_evt_t * p_ble_evt)
                 if (err_code != NRF_SUCCESS)
                 {
                     DM_ERR("[DM]:[CI 0x%02X]:[DI 0x%02X]: Failed to apply service context\r\n",
-                            handle.connection_id, 
+                            handle.connection_id,
                             handle.device_id);
 
                     event_result = DM_SERVICE_CONTEXT_NOT_APPLIED;
@@ -2862,7 +2915,7 @@ void dm_ble_evt_handler(ble_evt_t * p_ble_evt)
             }
             event_result = NRF_SUCCESS;
             notify_app   = true;
-            
+
             break;
 
         case BLE_GATTS_EVT_SYS_ATTR_MISSING:
@@ -2874,14 +2927,14 @@ void dm_ble_evt_handler(ble_evt_t * p_ble_evt)
 
         case BLE_GAP_EVT_SEC_REQUEST:
             DM_LOG("[DM]: >> BLE_GAP_EVT_SEC_REQUEST\r\n");
-            
+
             //Verify if the device is already bonded, and if it is bonded, initiate encryption.
-            //If the device is not bonded, an instance needs to be allocated in order to initiate 
-            //bonding. The application have to initiate the procedure, the module will not do this 
+            //If the device is not bonded, an instance needs to be allocated in order to initiate
+            //bonding. The application have to initiate the procedure, the module will not do this
             //automatically.
             event.event_id = DM_EVT_SECURITY_SETUP;
             notify_app     = true;
-            
+
             break;
 
         default:
