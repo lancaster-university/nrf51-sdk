@@ -4,17 +4,17 @@ include("${CODAL_UTILS_LOCATION}")
 
 # find sources and headers
 RECURSIVE_FIND_DIR(TOP_LEVEL_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/source" "*.h")
-RECURSIVE_FIND_FILE(TOP_LEVEL_SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/source" "*.c??")
+RECURSIVE_FIND_FILE(TOP_LEVEL_SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/source" "*.cpp")
+RECURSIVE_FIND_FILE(TOP_LEVEL_SOURCE_FILES2 "${CMAKE_CURRENT_SOURCE_DIR}/source" "*.c")
+RECURSIVE_FIND_FILE(TOP_LEVEL_SOURCE_FILES3 "${CMAKE_CURRENT_SOURCE_DIR}/source" "*.S")
+
+list(APPEND TOP_LEVEL_SOURCE_FILES "${TOP_LEVEL_SOURCE_FILES2}")
+list(APPEND TOP_LEVEL_SOURCE_FILES "${TOP_LEVEL_SOURCE_FILES3}")
 
 include_directories(${TOP_LEVEL_INCLUDE_DIRS})
 
 # create our target
 add_library(nrf51-sdk ${TOP_LEVEL_SOURCE_FILES})
-
-target_link_libraries(
-    nrf51-sdk
-    ble
-)
 
 # expose it to parent cmake.
 target_include_directories(nrf51-sdk PUBLIC ${TOP_LEVEL_INCLUDE_DIRS})
